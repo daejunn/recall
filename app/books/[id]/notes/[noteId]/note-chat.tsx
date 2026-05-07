@@ -30,7 +30,6 @@ export function NoteChat({
 
     setInput("");
 
-    // Optimistically add user message
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -38,7 +37,6 @@ export function NoteChat({
     };
     setMessages((prev) => [...prev, userMsg]);
 
-    // Add placeholder for assistant
     const assistantId = crypto.randomUUID();
     setMessages((prev) => [
       ...prev,
@@ -91,24 +89,29 @@ export function NoteChat({
   return (
     <div className="flex flex-col h-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+      <div className="flex-1 overflow-y-auto space-y-3 pb-4">
         {messages.length === 0 && (
-          <p className="text-sm text-neutral-400 text-center py-12">
-            이 책에서 떠오른 생각을 먼저 써보세요.
-          </p>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-sm text-stone-400 text-center px-6">
+              이 책에서 떠오른 생각을 먼저 써보세요.
+            </p>
+          </div>
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}>
+          <div
+            key={msg.id}
+            className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}
+          >
             <div
               className={
                 msg.role === "user"
-                  ? "max-w-[80%] rounded-2xl rounded-tr-sm bg-neutral-900 text-white px-4 py-2.5 text-sm"
-                  : "max-w-[80%] rounded-2xl rounded-tl-sm bg-neutral-100 text-neutral-900 px-4 py-2.5 text-sm"
+                  ? "max-w-[82%] rounded-2xl rounded-tr-sm bg-stone-900 text-white px-4 py-2.5 text-sm leading-relaxed"
+                  : "max-w-[82%] rounded-2xl rounded-tl-sm bg-white border border-stone-200 text-stone-800 px-4 py-2.5 text-sm leading-relaxed"
               }
             >
               {msg.content || (
-                <span className="text-neutral-400 animate-pulse">…</span>
+                <span className="text-stone-400 animate-pulse">•••</span>
               )}
             </div>
           </div>
@@ -117,7 +120,10 @@ export function NoteChat({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t border-neutral-200 pt-4 flex gap-2">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-stone-200 pt-4 flex gap-2 shrink-0"
+      >
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -130,12 +136,12 @@ export function NoteChat({
           placeholder="떠오른 생각을 써보세요… (Shift+Enter로 줄바꿈)"
           disabled={streaming}
           rows={3}
-          className="flex-1 resize-none rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 disabled:opacity-50"
+          className="flex-1 resize-none rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 disabled:opacity-50 placeholder:text-stone-400"
         />
         <button
           type="submit"
           disabled={!input.trim() || streaming}
-          className="self-end rounded-xl bg-neutral-900 text-white px-4 py-2 text-sm hover:bg-neutral-800 transition disabled:opacity-40"
+          className="self-end rounded-xl bg-stone-900 text-white px-4 py-2.5 text-sm hover:bg-stone-800 transition disabled:opacity-30"
         >
           {streaming ? "…" : "전송"}
         </button>

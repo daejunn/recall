@@ -31,25 +31,29 @@ export default async function NotePage({ params }: Props) {
   const book = Array.isArray(note.books) ? note.books[0] : note.books;
 
   return (
-    <main className="flex flex-col h-screen p-6 max-w-2xl mx-auto">
-      <header className="flex items-center gap-3 border-b border-neutral-200 pb-4 mb-6 shrink-0">
-        <a
-          href={`/books/${bookId}`}
-          className="text-sm text-neutral-500 hover:text-neutral-900"
-        >
-          ← {book?.title ?? "책으로"}
-        </a>
+    <main className="flex flex-col h-screen bg-[#fafaf8]">
+      <header className="bg-white border-b border-stone-200 px-6 py-4 shrink-0">
+        <div className="max-w-2xl mx-auto">
+          <a
+            href={`/books/${bookId}`}
+            className="text-sm text-stone-500 hover:text-stone-900 transition"
+          >
+            ← {book?.title ?? "책으로"}
+          </a>
+        </div>
       </header>
 
-      <NoteChat
-        noteId={noteId}
-        bookId={bookId}
-        initialMessages={(messages ?? []).map((m) => ({
-          id: m.id,
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        }))}
-      />
+      <div className="flex-1 overflow-hidden max-w-2xl w-full mx-auto px-6 py-6 flex flex-col">
+        <NoteChat
+          noteId={noteId}
+          bookId={bookId}
+          initialMessages={(messages ?? []).map((m) => ({
+            id: m.id,
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          }))}
+        />
+      </div>
     </main>
   );
 }

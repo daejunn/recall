@@ -24,9 +24,14 @@ export default async function HomePage() {
     );
   }
 
+  const { data: books } = await supabase
+    .from("books")
+    .select("id, title, author, created_at")
+    .order("created_at", { ascending: false });
+
   return (
     <main className="min-h-screen p-6 max-w-2xl mx-auto">
-      <header className="flex items-center justify-between border-b border-neutral-200 pb-4 mb-6">
+      <header className="flex items-center justify-between border-b border-neutral-200 pb-4 mb-8">
         <h1 className="text-2xl font-bold">Recall</h1>
         <form action={signOut} className="flex items-center gap-3">
           <span className="text-sm text-neutral-500">{user.email}</span>
@@ -39,12 +44,49 @@ export default async function HomePage() {
         </form>
       </header>
 
-      <section className="text-neutral-600">
-        <p>로그인 성공.</p>
-        <p className="text-xs mt-2 text-neutral-400">
-          다음 단계: 책 등록 기능 (Phase 2)
-        </p>
-      </section>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-semibold text-neutral-700">
+          내 책 ({books?.length ?? 0})
+        </h2>
+        <a
+          href="/books/new"
+          className="rounded-md bg-neutral-900 text-white px-3 py-1.5 text-sm hover:bg-neutral-800 transition"
+        >
+          + 새 책 등록
+        </a>
+      </div>
+
+      {!books || books.length === 0 ? (
+        <div className="text-center py-16 text-neutral-400">
+          <p>아직 등록된 책이 없어요.</p>
+          <a
+            href="/books/new"
+            className="mt-3 inline-block text-sm underline text-neutral-500 hover:text-neutral-900"
+          >
+            첫 책을 등록해 보세요 →
+          </a>
+        </div>
+      ) : (
+        <ul className="divide-y divide-neutral-100">
+          {books.map((book) => (
+            <li key={book.id}>
+              <a
+                href={`/books/${book.id}`}
+                className="flex flex-col py-4 hover:bg-neutral-50 -mx-2 px-2 rounded-md transition"
+              >
+                <span className="font-medium text-neutral-900">
+                  {book.title}
+                </span>
+                {book.author && (
+                  <span className="text-sm text-neutral-500 mt-0.5">
+                    {book.author}
+                  </span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }

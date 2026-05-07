@@ -13,11 +13,20 @@ export default async function BookPage({ params }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/");
 
-  const { data: book } = await supabase
-    .from("books")
-    .select("id, title, author, summary, key_concepts")
-    .eq("id", id)
-    .single();
+  const [{ data: book }, { data: notes }] = await Promise.all([
+    supabase
+      .from("books")
+      .select("id, title, author, summary, key_concepts")
+      .eq("id", id)
+      .single(),
+    supabase
+      .from("notes")
+      .select("id, created_at, messages(content, role)")
+      .eq("book_id", id)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1, { foreignTable: "messages" }),
+  ]);
 
   if (!book) notFound();
 
@@ -28,7 +37,7 @@ export default async function BookPage({ params }: Props) {
           ← 목록
         </a>
       </header>
-      <BookDetail book={book} />
+      <BookDetail book={book} notes={notes ?? []} bookId={id} />
     </main>
   );
 }

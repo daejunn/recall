@@ -43,11 +43,14 @@ JSON만 반환. 다른 설명 없이.`,
     ],
   });
 
-  const text =
+  const raw =
     message.content[0].type === "text" ? message.content[0].text : "";
 
+  // Strip markdown code blocks if Claude wrapped the JSON
+  const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+
   try {
-    const parsed = JSON.parse(text.trim());
+    const parsed = JSON.parse(text);
     return {
       known: Boolean(parsed.known),
       author: parsed.author ?? "",
@@ -55,6 +58,19 @@ JSON만 반환. 다른 설명 없이.`,
       key_concepts: parsed.key_concepts ?? "",
     };
   } catch {
+    // Last resort: try to extract JSON object from the text
+    const match = text.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        const parsed = JSON.parse(match[0]);
+        return {
+          known: Boolean(parsed.known),
+          author: parsed.author ?? "",
+          summary: parsed.summary ?? "",
+          key_concepts: parsed.key_concepts ?? "",
+        };
+      } catch { /* fall through */ }
+    }
     return { known: false, author: "", summary: "", key_concepts: "" };
   }
 }

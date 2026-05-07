@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateBook, deleteBook } from "../actions";
+import { createNote } from "./note-actions";
 
 type Book = {
   id: string;
@@ -11,7 +12,21 @@ type Book = {
   key_concepts: string | null;
 };
 
-export function BookDetail({ book }: { book: Book }) {
+type Note = {
+  id: string;
+  created_at: string;
+  messages: { content: string; role: string }[];
+};
+
+export function BookDetail({
+  book,
+  notes,
+  bookId,
+}: {
+  book: Book;
+  notes: Note[];
+  bookId: string;
+}) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -132,12 +147,62 @@ export function BookDetail({ book }: { book: Book }) {
         </section>
       )}
 
-      {/* 노트 영역 — Phase 3 */}
+      {/* 노트 목록 */}
       <section className="border-t border-neutral-200 pt-6">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-400 mb-2">
-          노트
-        </h3>
-        <p className="text-sm text-neutral-400">Phase 3에서 구현 예정</p>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            노트 ({notes.length})
+          </h3>
+          <form action={() => createNote(bookId)}>
+            <button
+              type="submit"
+              className="rounded-md bg-neutral-900 text-white px-3 py-1 text-xs hover:bg-neutral-800 transition"
+            >
+              + 새 노트
+            </button>
+          </form>
+        </div>
+
+        {notes.length === 0 ? (
+          <p className="text-sm text-neutral-400">
+            아직 노트가 없어요. 새 노트를 시작해보세요.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {notes.map((note, i) => {
+              const firstUserMsg = note.messages?.find(
+                (m) => m.role === "user",
+              );
+              const date = new Date(note.created_at).toLocaleDateString(
+                "ko-KR",
+                { month: "short", day: "numeric" },
+              );
+              return (
+                <li key={note.id}>
+                  <a
+                    href={`/books/${bookId}/notes/${note.id}`}
+                    className="block rounded-lg border border-neutral-200 px-4 py-3 hover:bg-neutral-50 transition"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-neutral-400">
+                        노트 {notes.length - i} · {date}
+                      </span>
+                    </div>
+                    {firstUserMsg ? (
+                      <p className="text-sm text-neutral-700 line-clamp-2">
+                        {firstUserMsg.content}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-neutral-400 italic">
+                        비어있는 노트
+                      </p>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
 
       {/* 수정 / 삭제 */}

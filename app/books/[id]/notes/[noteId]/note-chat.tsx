@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { deleteNote } from "../../note-actions";
 
 type Message = {
   id: string;
@@ -21,6 +22,13 @@ export function NoteChat({
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [, startTransition] = useTransition();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  function handleDelete() {
+    if (!confirm("이 노트를 삭제할까요?")) return;
+    setIsDeleting(true);
+    startTransition(() => deleteNote(noteId, bookId));
+  }
   const bottomRef = useRef<HTMLDivElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -117,6 +125,17 @@ export function NoteChat({
           </div>
         ))}
         <div ref={bottomRef} />
+      </div>
+
+      {/* Delete */}
+      <div className="flex justify-end pb-2 shrink-0">
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting || streaming}
+          className="text-xs text-stone-400 hover:text-red-500 transition disabled:opacity-40"
+        >
+          {isDeleting ? "삭제 중..." : "노트 삭제"}
+        </button>
       </div>
 
       {/* Input */}

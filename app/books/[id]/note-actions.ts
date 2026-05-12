@@ -3,6 +3,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export async function deleteNote(noteId: string, bookId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/");
+
+  await supabase.from("notes").delete().eq("id", noteId).eq("user_id", user.id);
+  redirect(`/books/${bookId}`);
+}
+
 export async function createNote(bookId: string) {
   const supabase = await createClient();
   const {

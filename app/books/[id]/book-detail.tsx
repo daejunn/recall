@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateBook, deleteBook } from "../actions";
-import { createNote } from "./note-actions";
+import { createNote, deleteNote } from "./note-actions";
 
 type Book = {
   id: string;
@@ -180,10 +180,10 @@ export function BookDetail({
                 { month: "short", day: "numeric" },
               );
               return (
-                <li key={note.id}>
+                <li key={note.id} className="flex items-center gap-2">
                   <a
                     href={`/books/${bookId}/notes/${note.id}`}
-                    className="block bg-white rounded-xl border border-stone-200 px-5 py-4 hover:border-stone-300 hover:shadow-sm transition"
+                    className="flex-1 block bg-white rounded-xl border border-stone-200 px-5 py-4 hover:border-stone-300 hover:shadow-sm transition"
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs text-stone-400">
@@ -200,6 +200,16 @@ export function BookDetail({
                       </p>
                     )}
                   </a>
+                  <button
+                    onClick={() => {
+                      if (!confirm("이 노트를 삭제할까요?")) return;
+                      startTransition(() => deleteNote(note.id, bookId));
+                    }}
+                    disabled={isPending}
+                    className="text-xs text-stone-300 hover:text-red-500 transition disabled:opacity-40 px-1 shrink-0"
+                  >
+                    삭제
+                  </button>
                 </li>
               );
             })}

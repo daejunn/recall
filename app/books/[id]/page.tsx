@@ -25,7 +25,8 @@ export default async function BookPage({ params }: Props) {
       .eq("book_id", id)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(1, { foreignTable: "messages" }),
+      .order("created_at", { ascending: true, referencedTable: "messages" })
+      .limit(1, { referencedTable: "messages" }),
   ]);
 
   if (!book) notFound();
